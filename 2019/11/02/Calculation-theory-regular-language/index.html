@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://evlpsrfc.xyz').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="在计算理论中，为了建立一个易于处理的数学理论，我们采用称为计算模型（computational model）的理想计算机来描述。本文从最简单的模型开始，它称为有穷状态机（finite state machine）或有穷自动机（finite automaton）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算理论之正则语言">
+<meta property="og:url" content="http://evlpsrfc.xyz/2019/11/02/Calculation-theory-regular-language/index.html">
+<meta property="og:site_name" content="Evlpsrfc&#39;s Blog">
+<meta property="og:description" content="在计算理论中，为了建立一个易于处理的数学理论，我们采用称为计算模型（computational model）的理想计算机来描述。本文从最简单的模型开始，它称为有穷状态机（finite state machine）或有穷自动机（finite automaton）。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190815224358915.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/2019081602181570.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190815225847564.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190815230603613.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190815232229384.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190815235437926.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190816023354195.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190816124302617.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190816154359829.png">
+<meta property="article:published_time" content="2019-11-02T11:48:13.000Z">
+<meta property="article:modified_time" content="2020-01-18T10:42:15.710Z">
+<meta property="article:author" content="Evlpsrfc">
+<meta property="article:tag" content="计算理论">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/20190815224358915.png">
+
+<link rel="canonical" href="http://evlpsrfc.xyz/2019/11/02/Calculation-theory-regular-language/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>计算理论之正则语言 | Evlpsrfc's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Evlpsrfc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://evlpsrfc.xyz/2019/11/02/Calculation-theory-regular-language/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Evlpsrfc">
+      <meta itemprop="description" content="你先画个包络面">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Evlpsrfc's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算理论之正则语言
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-02 19:48:13" itemprop="dateCreated datePublished" datetime="2019-11-02T19:48:13+08:00">2019-11-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-18 18:42:15" itemprop="dateModified" datetime="2020-01-18T18:42:15+08:00">2020-01-18</time>
+              </span>
+
+          
+            <span id="/2019/11/02/Calculation-theory-regular-language/" class="post-meta-item leancloud_visitors" data-flag-title="计算理论之正则语言" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在计算理论中，为了建立一个易于处理的数学理论，我们采用称为<strong>计算模型</strong>（computational model）的理想计算机来描述。本文从最简单的模型开始，它称为<strong>有穷状态机</strong>（finite state machine）或<strong>有穷自动机</strong>（finite automaton）。</p>
+<a id="more"></a>
+
+<p>如果想进一步了解本文所述知识，可以参阅机械工业出版社《计算理论导引》第一部分第一章。</p>
+<h2 id="有穷自动机"><a href="#有穷自动机" class="headerlink" title="有穷自动机"></a>有穷自动机</h2><p>有穷自动机是描述能力和资源极其有限的计算机的模型。但是一台存储如此少的计算机也能完成很多有用的事情了。事实上，我们的日常生活中处处都有它的应用场景。</p>
+<p>如下图所示，假设我们有一扇门，门只能向右侧单向打开。左侧是门的前缓冲区，右侧是门的后缓冲区。当前缓冲区检测到有人的时候，门就会打开以允许人流通过。当后缓冲区检测有人的时候，门会保持当前的状态以防止碰到后面的人。</p>
+<div align=center><img width="400px" src="https://img-blog.csdnimg.cn/20190815224358915.png" /></div>
+现在有一个控制器去控制这一扇门。控制器有且仅有两个状态：开（OPEN）、关（CLOSED）。我们有四种可能的输入：FRONT（仅前缓冲区有人）、REAR（仅后缓冲区有人）、BOTH（前后缓冲区都有人）、NEITHER（前后缓冲区都没人）。
+
+<p>控制器根据它的输入从一个状态转移到另一个状态。当它处于CLOSE状态且接收到输入FRONT时，转到OPEN状态，否则仍处于CLOSED状态；当它处于OPEN状态且接收到输入NEITHER时，转到CLOSED状态，否则保持OPEN状态。</p>
+<p>用有穷自动机理论来处理这一控制器是很好的方法。下图是用有穷状态机表述的控制器。它是一台存储器只有一位的计算机，因为这就足以记录其所处的状态了。而另外一些设备可能具有容量稍微大一点的存储器，比如电梯的控制器等等。</p>
+<div align=center><img width="400px" src="https://img-blog.csdnimg.cn/2019081602181570.png" /></div>
+下面用一个更加抽象化的例子来描述一个有穷状态机，我们假设它叫 $M$ 。下图被称为 $M$ 的**状态图**（state diagram），它有三个状态，记作 $q_1,q_2,q_3$ 。**起始状态**（start state） $q_1$ 用一个指向它的无出发点的箭头表示，**接受状态**（accept state） $q_2$ 带有双圈。从一个状态指向另一个状态的箭头称为**转移**（transition）。
+
+<div align=center><img width="400px" src="https://img-blog.csdnimg.cn/20190815225847564.png" /></div>
+当这个自动机接收到输入字符串，例如 $1101$ 时，它处理这个字符串并且产生一个输出。输出是接受或拒绝。处理从 $M$ 的起始状态开始。自动机从左至右一个接一个地接收输入字符串的所有符号。读到一个符号之后， $M$ 沿着标有该符号的转移从一个状态移动到另一个状态。当读到最后一个符号时产生输出。
+
+<p>例如，输入 $1101$ ， $M$ 的处理步骤如下：</p>
+<ol>
+<li>开始时处于状态 $q_1$ 。</li>
+<li>读到 $1$ ，状态从 $q_1$ 转移到 $q_2$ 。</li>
+<li>读到 $1$ ，状态从 $q_2$ 转移到 $q_2$ 。</li>
+<li>读到 $0$ ，状态从 $q_2$ 转移到 $q_3$ 。</li>
+<li>读到 $1$ ，状态从 $q_3$ 转移到 $q_2$ 。</li>
+<li>输出接受，因为在输入字符串的末端 $M$ 处于接受状态 $q_2$ 。</li>
+</ol>
+<p>用这台机器对各式各样的输入字符串进行检验，得知它接受且仅接受在最后一个 $1$ 的后面接偶数个 $0$ 的 $01$ 串。若 $A$ 是 $M$ 接受的全部字符串集合，则称 $A$ 是机器 $M$ 的<strong>语言</strong>，记作 $L(M)=A$ 。又称 $M$ <strong>识别</strong> $A$ 。一台机器可能接受若干字符串，但是它永远只能识别一个语言。如果机器不接受任何字符串，那么它仍然识别一个语言，即空语言 $\varnothing$ 。</p>
+<p>下面给出有穷自动机的形式化定义。</p>
+<blockquote>
+<p><strong>有穷自动机</strong>是一个五元组 $(Q,\Sigma,\delta,q_0,F)$ ，其中</p>
+<ol>
+<li>$Q$ 是一个有穷集合，称为<strong>状态集</strong>。</li>
+<li>$\Sigma$ 是一个有穷集合，称为<strong>字母表</strong>。</li>
+<li>$\delta:Q\times \Sigma\rightarrow Q$ 是<strong>状态转移函数</strong>。</li>
+<li>$q_0\in Q$ 是<strong>初始状态</strong>。</li>
+<li>$F\subseteq Q$ 是<strong>接受状态集合</strong>。</li>
+</ol>
+</blockquote>
+<p>设 $M=(Q,\Sigma,\delta,q_0,F)$ 是一台有穷自动机， $w=w_1w_2\cdots w_n$ 是一个字符串且 $w_i\in \Sigma,\forall i$ 。如果存在状态序列 $r_0,r_1,\cdots,r_n\in Q$ 满足下述条件：</p>
+<ol>
+<li>$r_0=q_0$</li>
+<li>$\delta(r_i,w_{i+1})=r_{i+1},i=0,\cdots,n-1$</li>
+<li>$r_n\in F$</li>
+</ol>
+<p>则称 $M$ <strong>接受</strong> $w$ 。</p>
+<p>如果 $A={w\vert M\text{ 接受 }w}$ ，则称 $M$ <strong>识别语言</strong> $A$ 。</p>
+<p>如果一个语言被一台有穷自动机识别，则称它是<strong>正则语言</strong>（regular language）。</p>
+<p>下面介绍正则语言上的运算。</p>
+<blockquote>
+<p>设 $A$ 和 $B$ 是两个语言，定义正则运算<strong>并</strong>（union）、<strong>连接</strong>（concatenation）和<strong>星号</strong>（star）如下：</p>
+<ol>
+<li>并：$A\cup B={x\vert x\in A \vee x \in B}$</li>
+<li>连接： $A\circ B={xy \vert x \in A \wedge y \in B}$</li>
+<li>星号： $A^{<em>}={x_1x_2\cdots x_k \vert k\in\mathbb{N}^{</em>}\wedge (\forall i)(x_i\in A)}$</li>
+</ol>
+</blockquote>
+<p>并运算就是把 $A$ 和 $B$ 中的所有字符串合并在一个语言中。连接运算以所有可能的方式把 $A$ 中的一个字符串接在 $B$ 中的一个字符串前面，从而产生新语言中的所有字符串。星号运算把 $A$ 中的任意个字符串以任意顺序连接在一起得到新语言中的一个字符串。不管 $A$ 是什么，空串 $\varepsilon$ 总是 $A^*$ 的一个成员。</p>
+<p>正则运算都是封闭的。其中并运算的封闭性可以用构造性证明，证明过程如下：</p>
+<p><strong>证明：</strong></p>
+<p>设 $M_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ 识别语言 $A_1$ ， $M_2=(Q_2,\Sigma,\delta_2,q_2,F_2)$ 识别语言 $A_2$ 。下面我们将构造一个识别 $A_1\cup A_2$ 的自动机 $M=(Q,\Sigma,\delta,q_0,F)$ 。</p>
+<p>令 $$Q=Q_1 \times Q_2 \ \delta(\langle r_1,r_2 \rangle,a)=\langle \delta_1(r_1,a),\delta_2(r_2,a) \rangle \ q_0=\langle q_1,q_2 \rangle \ F={\langle r_1,r_2 \rangle \vert r_1\in F_1 \vee r_2 \in F_2}$$ 构造完毕。</p>
+<p>至于其他两种运算封闭性的证明，需要借助下文的非确定性的概念。</p>
+<h2 id="非确定性"><a href="#非确定性" class="headerlink" title="非确定性"></a>非确定性</h2><p>到现在为止，在我们的讨论中，计算的每一步都按照唯一的方式跟在前一步的后面。当机器处于给定的状态并读入下一个输入符号时，可以知道机器的下一个状态是什么——它是确定的。因此，称这是<strong>确定型计算</strong>（deterministic computation）。在<strong>非确定型</strong>（nondeterministic）机器中，任何一点的下一个状态都可能存在若干个选择。</p>
+<p>下图所示即为一台非确定型有穷自动机。</p>
+<div align=center><img width="500px" src="https://img-blog.csdnimg.cn/20190815230603613.png" /></div>
+确定型有穷自动机（简称DFA）与非确定型有穷自动机（简称NFA）之间的区别是显而易见的。第一，DFA的每一个状态对于字母表中的每一个符号总是恰好有一个转移箭头射出。然而上图违反了这条规则。状态 $q_1$ 对于 $0$ 有一个射出的箭头，而对于 $1$ 有两个射出的箭头； $q_2$ 对于 $0$ 有一个箭头，而对于 $1$ 没有箭头。在NFA中，一个状态对于字母表中的每一个符号可能有任意个射出的箭头。第二，在DFA中，转移箭头上的标号都取自字母表的符号，而上图的NFA中有一个带有标号 $\varepsilon$ 的箭头。一般说来，NFA中从一个状态可能射出任意个带有标号 $\varepsilon$ 的箭头。
+
+<p>为了将不确定性纳入有穷自动机中，NFA用并行运算来表示多个可能情况。对于从某个状态接受同一个输入引出的多个箭头，NFA会对于每一个箭头建立一个自己的备份，并且并行地向下执行所有的备份。如果某个备份在某个状态时接收到了一个没有对应转移的输入，则这个备份和与之相关的分支就会自动结束。最后，如果机器的某一个备份在输入的末端处于接受状态，则这台NFA接受输入字符串。对于标有 $\varepsilon$ 的箭头，它表示，不用读任何输入，机器自动分裂出一个备份，且每一个带 $\varepsilon$ 的箭头都会产生一份独立的备份。</p>
+<p>考虑上面给出的NFA，下图描绘了它读取输入 $010110$ 的计算。</p>
+<div align=center><img width="500px" src="https://img-blog.csdnimg.cn/20190815232229384.png" /></div>
+经过不同字符串的多次实验，我们发现上述NFA接受所有含有 $101$ 或 $11$ 作为子串的字符串。因此，我们还可以用一个DFA来等价地表述它。事实上我们即将会证明，任意一台NFA都会有一台DFA与之等价。
+
+<p>在证明这一点以前，我们首先给出非确定型有穷自动机的形式化定义：</p>
+<blockquote>
+<p>非确定型有穷自动机是一个五元组 $(Q,\Sigma,\delta,q_0,F)$ ，其中</p>
+<ol>
+<li>$Q$ 是有穷的状态集；</li>
+<li>$\Sigma$ 是有穷的字母表；</li>
+<li>$\delta:Q\times \Sigma_{\varepsilon}\rightarrow \mathscr{P}(Q)$ 是转移函数；</li>
+<li>$q_0 \in Q$ 是起始状态；</li>
+<li>$F\subseteq Q$ 是接受状态集。</li>
+</ol>
+</blockquote>
+<p>设 $N=(Q,\Sigma,\delta,q_0,F)$ 是一台NFA， $w$ 是字母表 $\Sigma$ 上的一个字符串。如果能把 $w$ 写成 $w=y_1y_2\cdots y_m$ 的形式，其中 $\forall i,y_i\in \Sigma_{\varepsilon}$ ，并且存在状态序列 $r_0,r_1,\cdots,r_m\in Q$ 满足下述三个条件：</p>
+<ol>
+<li>$r_0=q_0$</li>
+<li>$r_{i+1}\in \delta(r_i,y_{i+1}),i=0,1,\cdots,m-1$</li>
+<li>$r_m\in F$</li>
+</ol>
+<p>则称 $N$ <strong>接受</strong> $w$ 。</p>
+<p>如果两台机器识别同样的语言，则称它们是<strong>等价</strong>的。下面我们证明NFA和DFA的等价性。</p>
+<p>我们仍然使用构造性证明。设 $N=(Q,\Sigma,\delta,q_0,F)$ 是识别语言 $A$ 的一台NFA，要构造一台DFA识别 $A$ 。我们记这个DFA为 $M=(Q’,\Sigma,\delta’,q_0’,F’)$ 。我们构造的主要思想是把NFA的多线程变为含有多个“单元状态”的状态集合。</p>
+<p>定义 $\mathscr{P}(Q)$ 上的函数 $E$ ，对于 $Q$ 的一个子集 $R$ ， $E(R)$ 表示从 $R$ 的成员出发沿着 $0$ 个或多个 $\varepsilon$ 箭头可以到达的状态集合。</p>
+<p>令 $$<br>Q’=\mathscr{P}(Q)\<br>\delta’(R,a)=\bigcup_{r\in R}E[\delta(r,a)]\<br>q_0’=E({q_0})\<br>F’={R\in Q’\vert R\cap F \ne \varnothing}<br>$$ 得证。</p>
+<p>下面给出两台等价的有穷自动机，左边是NFA，右边是与之等价的DFA。</p>
+<center class="half">
+    <img src="https://img-blog.csdnimg.cn/20190815235437926.png" width="200"/><img src="https://img-blog.csdnimg.cn/20190816023354195.png" width="300"/>
+</center>
+
+<p>下面我们使用非确定性来证明正则运算的封闭性。</p>
+<p>对于并运算的封闭性：</p>
+<p>设 $N_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ 识别 $A_1$ ，并且 $N_2=(Q_2,\Sigma,\delta_2,q_2,F_2)$ 识别 $A_1$ 。我们构造识别 $A_1\cup A_2$ 的 $N=(Q,\Sigma,\delta,q_0,F)$ ：</p>
+<ol>
+<li>$Q={q_0}\cup Q_1 \cup Q_2$ 。</li>
+<li>$q_0$ 是新添加的状态。</li>
+<li>$F=F_1\cup F_2$ 。</li>
+<li>对于每一个 $q\in Q$ 和每一个 $a\in \Sigma_{\varepsilon}$ ， $$\delta(q,a)=\left{\begin{aligned}<br>&amp;\delta_1(q,a)&amp;q\in Q_1\<br>&amp;\delta_2(q,a)&amp;q\in Q_2\<br>&amp;{q_1,q_2}&amp;q=q_0,a=\varepsilon\<br>&amp;\varnothing&amp;q=q_0,a\ne \varepsilon<br>\end{aligned}\right.$$</li>
+</ol>
+<p>对于连接运算的封闭性：</p>
+<p>设 $N_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ 识别 $A_1$ ，并且 $N_2=(Q_2,\Sigma,\delta_2,q_2,F_2)$ 识别 $A_1$ 。我们构造识别 $A_1\circ A_2$ 的 $N=(Q,\Sigma,\delta,q_0,F)$ ：</p>
+<ol>
+<li>$Q=Q_1 \cup Q_2$ 。</li>
+<li>$q_0=q_1$ 。</li>
+<li>$F=F_2$ 。</li>
+<li>对于每一个 $q\in Q$ 和每一个 $a\in \Sigma_{\varepsilon}$ ， $$\delta(q,a)=\left{\begin{aligned}<br>&amp;\delta_1(q,a)&amp;q\in Q_1,q\notin F_1\<br>&amp;\delta_1(q,a)&amp;q\in F_1,a\ne \varepsilon\<br>&amp;\delta_1(q,a)\cup{q_2}&amp;q\in F_1,a=\varepsilon\<br>&amp;\delta_2(q,a)&amp;q\in Q_2<br>\end{aligned}\right.$$</li>
+</ol>
+<p>对于星号运算的封闭性：</p>
+<p>设 $N_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ 识别 $A_1$ ，我们构造识别 $A_1^*$ 的 $N=(Q,\Sigma,\delta,q_0,F)$ ：</p>
+<ol>
+<li>$Q={q_0}\cup Q_1$ 。</li>
+<li>$q_0$ 是新添加的状态。</li>
+<li>$F={q_0}\cup F_1$ 。</li>
+<li>对于每一个 $q\in Q$ 和每一个 $a\in \Sigma_{\varepsilon}$ ， $$\delta(q,a)=\left{\begin{aligned}<br>&amp;\delta_1(q,a)&amp;q\in Q_1,q\notin F_1\<br>&amp;\delta_1(q,a)&amp;q\in F_1,a\ne \varepsilon\<br>&amp;\delta_1(q,a)\cup{q_1}&amp;q\in F_1,a=\varepsilon\<br>&amp;{q_1}&amp;q=q_0,a=\varepsilon\<br>&amp;\varnothing&amp;q=q_0,a\ne \varepsilon<br>\end{aligned}\right.$$</li>
+</ol>
+<h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><p>用正则运算符构造描述语言的表达式叫做<strong>正则表达式</strong>。例如 $(0\cup1)0^*$ 表示由一个 $0$ 或者一个 $1$ 后面跟着任意个 $0$ 的所有字符串组成的语言。</p>
+<p>下面给出正则表达式的形式化定义：</p>
+<blockquote>
+<p>称 $R$ 是一个<strong>正则表达式</strong>，如果 $R$ 是</p>
+<ol>
+<li>$a$ ，这里 $a$ 是字母表 $\Sigma$ 中的一个元素；</li>
+<li>$\varepsilon$ ；</li>
+<li>$\varnothing$ ；</li>
+<li>$(R_1\cup R_2)$ ，这里 $R_1$ 和 $R_2$ 都是正则表达式；</li>
+<li>$(R_1\circ R_2)$ ，这里 $R_1$ 和 $R_2$ 都是正则表达式；</li>
+<li>$(R_1^*)$ ，这里 $R_1$ 是正则表达式。</li>
+</ol>
+</blockquote>
+<p>表达式中的括号可以略去。如果略去括号，计算按照下述有限顺序进行：星号，连接，并。</p>
+<p>为便于描述，我们将 $RR^*$ 记作 $R^+$ ，将 $k$ 个 $R$ 中的串通过连接得到的串记作 $R^k$ 。</p>
+<p>当想要明显地区分正则表达式 $R$ 和它描述的语言时，可以把 $R$ 描述的语言写成 $L(R)$ 。</p>
+<p>就描述能力而言正则表达式和有穷自动机是等价的，以下是证明：</p>
+<p>首先我们证明，如果一个语言可以用正则表达式描述，那么它是正则的。</p>
+<p>设 $R$ 是一个正则表达式，现将 $R$ 转换成一台NFA，记作 $N$ 。考虑正则表达式定义中的六种情况：</p>
+<ol>
+<li>$R=a$ 。则 $N=({q_1,q_2},\Sigma,\delta,q_1,{q_2})$ ，其中 $\delta$ 的定义如下：若 $r\ne q_1$ 或 $b\ne a$ ，则 $\delta(q_1,a)={q_2},\delta(r,b)=\varnothing$ 。</li>
+<li>$R=\varepsilon$ 。则 $N=({q_1},\Sigma,\delta,q_1,{q_1})$ ，其中 $\forall r,b,\delta(r,b)=\varnothing$ 。</li>
+<li>$R=\varnothing$ 。则 $N=({q},\Sigma,\delta,q,\varnothing)$ ，其中 $\forall r,b,\delta(r,b)=\varnothing$ 。</li>
+</ol>
+<p>至于后三种情况，只需使用正则语言类在正则运算下封闭性的证明中所给出的构造即可。</p>
+<p>接着我们证明，如果一个语言是正则的，则可以用正则表达式描述它。</p>
+<p>在证明之前，我们先引入一个新型的有穷自动机——广义非确定型有穷自动机，简称GNFA。</p>
+<p>事实上，GNFA就是NFA，不过转移箭头可以用任何正则表达式作标号，而不是只能用字母表的成员或 $\varepsilon$ 作标号。GNFA读入符号段，而不必一次只能读一个符号。下图是一个GNFA的例子：</p>
+<div align=center><img width="500px" src="https://img-blog.csdnimg.cn/20190816124302617.png" /></div>
+为方便起见，我们约定GNFA具有下述特殊形式：
+
+<ul>
+<li>起始状态有射到其他每一个状态的箭头，但是没有从任何其他状态射入的箭头。</li>
+<li>有唯一的一个接受状态，并且它有从其他每个状态射入的箭头，但是没有射到任何其他状态的箭头。此外，接受状态和起始状态不同。</li>
+<li>除起始状态和接受状态外，每个状态到自身和其他每个状态都有一个箭头。</li>
+</ul>
+<p>注意到性质中有一条“接受状态和起始状态不同”。因此一台GNFA至少有两个状态。而事实上，任何一台GNFA都可以等价地转化为一台只有两个状态的GNFA。我们假设这台GNFA有 $k&gt;2$ 个状态。我们现在要删除一个状态 $q_{\text{rip}}$ ，然后对剩下的状态进行调整使之与原GNFA等价。 $q_{\text{rip}}$ 可以是除了起始状态和接受状态的所有状态。下图即为调整方法：</p>
+<div align=center><img width="600px" src="https://img-blog.csdnimg.cn/20190816154359829.png" /></div>
+在原机器中，如果
+
+<ol>
+<li>从 $q_i$ 到 $q_{\text{rip}}$ 有一个标记为 $R_1$ 的箭头</li>
+<li>从 $q_{\text{rip}}$ 到它自己有一个标记为 $R_2$ 的箭头</li>
+<li>从 $q_{\text{rip}}$ 到 $q_j$ 有一个标记为 $R_3$ 的箭头</li>
+<li>从 $q_i$ 到 $q_j$ 有一个标记为 $R_4$ 的箭头</li>
+</ol>
+<p>那么在新机器中，从 $q_i$ 到 $q_j$ 的箭头的标记为 $(R_1)(R_2)^*(R_3)\cup(R_4)$ 。对从任一状态 $q_i$ 到 $q_j$ （包括 $q_i=q_j$ 在内）的每一个箭头都进行这样的改动，新的机器仍然识别原来的语言。</p>
+<p>此外，我们可以很容易地把一个DFA转换成GNFA，只需进行以下操作即可：添加一个新的起始状态和一个新的接受状态，从新的起始状态到原起始状态连一个 $\varepsilon$ 箭头，从每一个原接受状态到新的接受状态连一个 $\varepsilon$ 箭头；如果一个箭头有多个标记，则把它替换成一个标记着原先标记的并集的箭头；最后，在没有箭头的状态之间添加标记 $\varnothing$ 的箭头。</p>
+<p>转回我们的证明。我们需要证明的是，如果一个语言是正则的，则有一个正则表达式描述它。首先，如果一个语言是正则的，那么它能被一台DFA接受，因此它也能被一台GNFA接受，因此也能被一台仅含有两个状态的等价GNFA接受。设这台GNFA上从起始状态到接受状态的正则表达式为 $R$ ，则 $R$ 即为描述这个语言的正则表达式。证毕。</p>
+<h2 id="非正则语言"><a href="#非正则语言" class="headerlink" title="非正则语言"></a>非正则语言</h2><p>有穷自动机也是有其局限性的，有些语言不能被有穷自动机识别。比如，设语言 $B={0^n1^n\vert n\in\mathbb{N}}$ 。如果想找一台识别 $B$ 的DFA，会发现这台机器看起来需要记住它在输入中读到了多少个 $0$ ，由于 $0$ 的个数没有限制，因此机器将不得不记住无穷多个可能。但用有穷自动机无法做到这一点。</p>
+<p>不过这样的评判并不严谨，比如 $C={w\vert count(0)=count(1)}$ 和 $D={w\vert count(01)=count(10)}$ （其中 $count(x)$ 表示统计字符串 $x$ 在 $w$ 中出现的次数）这两个语言，看似很相像，但 $C$ 不是正则语言，而 $D$ 是正则语言。</p>
+<p>因此我们引入了一个称为<strong>泵引理</strong>（pumping lemma）的定理。该定理指出，所有的正则语言都有一个特定值——<strong>泵长度</strong>（pumping length），语言中的所有字符串只要它的长度不小于泵长度，就可以被“抽取”。下面是泵引理的形式化表述：</p>
+<blockquote>
+<p>若 $A$ 是一个正则语言，则存在一个数 $p$ （泵长度）使得，如果 $s$ 是 $A$ 中任一长度不小于 $p$ 的字符串，那么 $s$ 可以被分成三段， $s=xyz$ ，满足下述条件：</p>
+<ol>
+<li>$xy^iz\in A,\forall i\in\mathbb{N}$</li>
+<li>$|y|&gt;0$</li>
+<li>$|xy|\leqslant p$</li>
+</ol>
+<p>其中 $|\cdot|$ 表示字符串的长度， $y^i$ 表示连续的 $i$ 个 $y$ 。</p>
+</blockquote>
+<p><strong>证明</strong><br>设 $M=(Q,\Sigma,\delta,q_1,F)$ 是一台识别 $A$ 的DFA， $p$ 是 $M$ 的状态数。设 $s=s_1s_2\cdots s_n$ 是 $A$ 中长度为 $n$ 的字符串，这里 $n\geqslant p$ 。又设 $r_1,\cdots,r_{n+1}$ 是 $M$ 在处理 $s$ 的过程中进入的状态序列，因而 $r_{i+1}=\delta(r_i,s_i),i=1,2,\cdots,n$ 。该序列的长度为 $n+1$ ，不小于 $p+1$ 。根据抽屉原理，在该序列的前 $p+1$ 个元素中，一定有两个相同的状态。设第一个是 $r_j$ ，第二个是 $r_l$ 。由于 $r_l$ 出现在序列的前 $p+1$ 个位置中，而且序列是从 $r_1$ 开始的，故 $l\leqslant p+1$ 。此时，令 $x=s_1\cdots s_{j-1},y=s_j\cdots s_{l-1},z=s_l\cdots s_n$ 。由于 $x$ 把 $M$ 从 $r_1$ 带到 $r_j$ ， $y$ 把 $M$ 从 $r_j$ 带回到 $r_j$ ， $z$ 把 $M$ 从 $r_j$ 带到 $r_{n+1}$ ，而 $r_{n+1}$ 是一个接受状态，故对于 $i\in\mathbb{N}$ ， $M$ 接受 $xy^iz$ 。已知 $j\ne l$ ，故 $|y|&gt;0$ ；又已知 $l\leqslant p+1$ ，故 $|xy|\leqslant p$ 。于是，满足泵引理的三个条件。证毕。</p>
+<p>最后，作为示例，我们用泵引理证明几个语言不是正则语言。</p>
+<p>首先证明 $B={0^n1^n\vert n\in\mathbb{N}}$ 不是正则语言。</p>
+<p>假设 $B$ 是正则的。令 $p$ 是其泵长度。选择 $s$ 为字符串 $0^p1^p$ ，则 $s$ 可以写成 $s=xyz$ 的形式。我们考虑以下三种情况：</p>
+<ol>
+<li>$y$ 只包含 $0$ 。此时， $xyyz$ 中的 $0$ 比 $1$ 多，从而 $xy^2z\notin B$ ，矛盾。</li>
+<li>$y$ 只包含 $1$ ，与上一种情况类似。</li>
+<li>$y$ 中同时包含 $0$ 和 $1$ 。此时， $xyyz$ 中有一部分 $1$ 出现在了 $0$ 的前面，从而 $xy^2z\notin B$ ，矛盾。</li>
+</ol>
+<p>因此 $B$ 不是正则的。</p>
+<p>我们再证明 $C={w\vert count(0)=count(1)}$ 不是正则语言。</p>
+<p>假设 $C$ 是正则的。则 $C\cap 0^<em>1^</em>$ 也是正则的（并运算的封闭性）。然而 $C\cap 0^<em>1^</em>=B$ 不是正则的，因此 $C$ 不是正则的。</p>
+<p>总之，使用泵引理去证明一个语言不是正则语言需要巧妙地选择 $s$ ，如果选取比较难的话，可以试着用另一个非正则语言去证明它。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Evlpsrfc 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E7%90%86%E8%AE%BA/" rel="tag"># 计算理论</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/29/hexo-blog/" rel="prev" title="使用Hexo搭建Github Page">
+      <i class="fa fa-chevron-left"></i> 使用Hexo搭建Github Page
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/06/Regex-in-python/" rel="next" title="Python正则表达式笔记">
+      Python正则表达式笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#有穷自动机"><span class="nav-number">1.</span> <span class="nav-text">有穷自动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非确定性"><span class="nav-number">2.</span> <span class="nav-text">非确定性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则表达式"><span class="nav-number">3.</span> <span class="nav-text">正则表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非正则语言"><span class="nav-number">4.</span> <span class="nav-text">非正则语言</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Evlpsrfc"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Evlpsrfc</p>
+  <div class="site-description" itemprop="description">你先画个包络面</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evlpsrfc" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evlpsrfc" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:evlpsrfc@163.com" title="E-Mail → mailto:evlpsrfc@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Evlpsrfc</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+  <script>
+  function leancloudSelector(url) {
+    url = encodeURI(url);
+    return document.getElementById(url).querySelector('.leancloud-visitors-count');
+  }
+  if (CONFIG.page.isPost) {
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.getAttribute('id'));
+      var title = visitors.getAttribute('data-flag-title');
+
+      Counter('get', `/classes/Counter?where=${JSON.stringify({ url })}`)
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .then(response => response.json())
+              .then(() => {
+                leancloudSelector(url).innerText = counter.time + 1;
+              })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              })
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+  } else {
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.getAttribute('id'));
+      });
+
+      Counter('get', `/classes/Counter?where=${JSON.stringify({ url: { '$in': entries } })}`)
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length === 0) {
+            document.querySelectorAll('.leancloud_visitors .leancloud-visitors-count').forEach(element => {
+              element.innerText = 0;
+            });
+            return;
+          }
+          for (let item of results) {
+            let { url, time } = item;
+            leancloudSelector(url).innerText = time;
+          }
+          for (let url of entries) {
+            var element = leancloudSelector(url);
+            if (element.innerText == '') {
+              element.innerText = 0;
+            }
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+  }
+
+  fetch('https://app-router.leancloud.cn/2/route?appId=1ylC7NP7CNcXp2C4NJUngt9Q-gzGzoHsz')
+    .then(response => response.json())
+    .then(({ api_server }) => {
+      var Counter = (method, url, data) => {
+        return fetch(`https://${api_server}/1.1${url}`, {
+          method: method,
+          headers: {
+            'X-LC-Id': '1ylC7NP7CNcXp2C4NJUngt9Q-gzGzoHsz',
+            'X-LC-Key': '6ka8Pkg2leBsmk3LJG4ycMh2',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

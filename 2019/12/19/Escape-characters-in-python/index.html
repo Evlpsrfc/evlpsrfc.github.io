@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://evlpsrfc.xyz').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="不少初学者在学习Python的过程中，特别是学到了正则表达式的时候，都为转义字符而迷惑。当遇到以下这些样例的时候，很容易就解释不清楚它的原理。本文将集中讲解一下Python中的转义字符。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python中的转义字符">
+<meta property="og:url" content="http://evlpsrfc.xyz/2019/12/19/Escape-characters-in-python/index.html">
+<meta property="og:site_name" content="Evlpsrfc&#39;s Blog">
+<meta property="og:description" content="不少初学者在学习Python的过程中，特别是学到了正则表达式的时候，都为转义字符而迷惑。当遇到以下这些样例的时候，很容易就解释不清楚它的原理。本文将集中讲解一下Python中的转义字符。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-12-19T06:43:59.000Z">
+<meta property="article:modified_time" content="2020-01-18T09:43:48.360Z">
+<meta property="article:author" content="Evlpsrfc">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://evlpsrfc.xyz/2019/12/19/Escape-characters-in-python/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Python中的转义字符 | Evlpsrfc's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Evlpsrfc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://evlpsrfc.xyz/2019/12/19/Escape-characters-in-python/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Evlpsrfc">
+      <meta itemprop="description" content="你先画个包络面">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Evlpsrfc's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Python中的转义字符
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-19 14:43:59" itemprop="dateCreated datePublished" datetime="2019-12-19T14:43:59+08:00">2019-12-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-18 17:43:48" itemprop="dateModified" datetime="2020-01-18T17:43:48+08:00">2020-01-18</time>
+              </span>
+
+          
+            <span id="/2019/12/19/Escape-characters-in-python/" class="post-meta-item leancloud_visitors" data-flag-title="Python中的转义字符" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>不少初学者在学习Python的过程中，特别是学到了正则表达式的时候，都为转义字符而迷惑。当遇到以下这些样例的时候，很容易就解释不清楚它的原理。本文将集中讲解一下Python中的转义字符。</p>
+<a id="more"></a>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">'\\ '</span> == <span class="string">'\ '</span></span><br><span class="line"><span class="literal">True</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> re</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\\ '</span>, <span class="string">'\\ '</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">1</span>, <span class="number">2</span>), match=<span class="string">' '</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\n'</span>, <span class="string">'\n'</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">1</span>), match=<span class="string">'\n'</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\\n'</span>, <span class="string">'\n'</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">1</span>), match=<span class="string">'\n'</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\\\A'</span>, <span class="string">'\A'</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">2</span>), match=<span class="string">'\\A'</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\\\\\\\\\\ '</span>, <span class="string">'\\\ '</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">3</span>), match=<span class="string">'\\\\ '</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="原生转义"><a href="#原生转义" class="headerlink" title="原生转义"></a>原生转义</h2><p>Python中自带的转义字符有：</p>
+<ol>
+<li>反斜杠：<code>\\</code></li>
+<li>单引号：<code>\&#39;</code></li>
+<li>双引号：<code>\&quot;</code></li>
+<li>ASCII码中的特殊字符：<ol>
+<li>响铃：<code>\a</code></li>
+<li>退格键：<code>\b</code></li>
+<li>换页符：<code>\f</code></li>
+<li>换行符：<code>\n</code></li>
+<li>回车键：<code>\r</code></li>
+<li>水平制表符：<code>\t</code></li>
+<li>垂直制表符：<code>\v</code></li>
+</ol>
+</li>
+<li>八进制编码字符：<code>\o..</code></li>
+<li>十六进制编码字符：<code>\x..</code></li>
+</ol>
+<p>除此之外就没有了。</p>
+<p>当我们在Python中通过直接创建的方式（也就是手动输入一对引号，中间填字符）构造出一个字符串对象，它会默认按照上述规则进行转义（从左至右遍历，若能转义的，则转义，否则不转义）。比如，<code>&#39;\\n&#39;</code>会转义为一个反斜杠和一个<code>n</code>；<code>&#39;\A&#39;</code>则是一个反斜杠和一个<code>A</code>。</p>
+<p>需要补充的一点是，强制不转义是在构造过程中处理的，而不是在一开始。因而我们就能解释，为什么无论是<code>&#39;\&#39;</code>还是<code>r&#39;\&#39;</code>都是不合法的，因为Python都会优先将<code>\</code>和其后的<code>&#39;</code>理解成转义字符。</p>
+<p>当我们要将一个字符串对象显示出来的时候（这里是“显示”，而不是“打印”），Python会试图显示一个转义前的字符串版本。这个“转义前”不代表就是它被构造时传入的字符串，也就是说，一个<code>\</code>和一个<code>n</code>会显示成<code>&#39;\\n&#39;</code>，一个<code>\</code>和一个<code>A</code>会显示成<code>&#39;\\A&#39;</code>，尽管它可能是由<code>&#39;\A&#39;</code>构造出的。</p>
+<p>当我们要把字符串打印出来的时候（也就是调用<code>print</code>函数），Python会显示最简洁的版本，也就是转义后的版本。如，<code>print(&#39;\n&#39;)</code>会直接换两行（包括<code>print</code>函数自带的一行），而不是显示<code>&#39;\\n&#39;</code>。</p>
+<p>以上就是Python中原生的转义字符。我们也可以说字符串在Python中有三种可见的形态：构造传入的、显示的、打印的。</p>
+<p>我们由此可以解释第一个样例：<code>&#39;\\ &#39; == &#39;\ &#39;</code>。因为前一个构造以后是一个<code>\</code>和一个空格，后一个也是，所以两者相等。</p>
+<h2 id="正则模块中的转义字符"><a href="#正则模块中的转义字符" class="headerlink" title="正则模块中的转义字符"></a>正则模块中的转义字符</h2><p>在Python的<code>re</code>模块中，为了增强字符串匹配时的工作效率，除了包含原生的转义字符外，又引入了更多的转义字符，它们有：</p>
+<ol>
+<li><code>&#39;\number&#39;</code>，表示组号为<code>number</code>的组。</li>
+<li><code>&#39;\A&#39;</code>，匹配字符串的开头，相当于<code>&#39;^&#39;</code>。</li>
+<li><code>&#39;\Z&#39;</code>，匹配字符串的末尾。</li>
+<li><code>&#39;\b&#39;</code>，匹配单词开头或结尾处的空串。</li>
+<li><code>&#39;\B&#39;</code>，匹配非单词开头或结尾处的空串。</li>
+<li><code>&#39;\d&#39;</code>，匹配数字，相当于<code>&#39;[0-9]&#39;</code>。</li>
+<li><code>&#39;\D&#39;</code>，匹配非数字，相当于<code>&#39;[^\d]&#39;</code>。</li>
+<li><code>&#39;\s&#39;</code>，匹配空白字符，相当于<code>&#39;[ \t\n\r\f\v]&#39;</code>。</li>
+<li><code>&#39;\w&#39;</code>，匹配单词字符，相当于<code>&#39;[a-zA-Z0-9_]&#39;</code>。</li>
+<li><code>&#39;\W&#39;</code>，匹配非单词字符，相当于<code>&#39;[^\w]&#39;</code>。</li>
+</ol>
+<p>同时我们又规定，跟在<code>\</code>后面的字符统统被转义，当那个字符没有对应的转义规则的时候，转义后的字符就表示那个字符本身，比如<code>&#39;\A&#39;</code>会被转义为<code>A</code>。</p>
+<p>当我们构造一个<code>Pattern</code>对象的时候（通常使用<code>re.compile</code>方法，或者调用<code>re.findall</code>等函数时传入字符串自动构造），它会先按照原生转义的规则进行转义（相当于先构造出一个<code>str</code>对象出来，然后传给<code>re.compile</code>），然后再进行<code>re</code>模块的二次转义（这一过程中也包含原生的转义规则，知道一点很重要），得到最终的<code>Pattern</code>对象。两个转义过程都是从左至右进行的。</p>
+<p>我们来解释一下一开始的几个样例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\\ '</span>, <span class="string">'\\ '</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">1</span>, <span class="number">2</span>), match=<span class="string">' '</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>re.search</code>函数，前一个是<code>pattern</code>，所以<code>&#39;\\ &#39;</code>先经过原生的转义，得到一个<code>\</code>和一个空格（这还只是一个<code>str</code>对象而不是<code>Pattern</code>对象），然后再经过模块的转义变成一个空格；后一个只经过原生转义，变成一个<code>\</code>和一个空格。因此最终匹配的只是空格。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\n'</span>, <span class="string">'\n'</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">1</span>), match=<span class="string">'\n'</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p>前一个<code>&#39;\n&#39;</code>先经过原生转义变成单个换行符，然后经过模块转义后不变；后面的<code>&#39;\n&#39;</code>只经过原生转义，变为单个换行符。因此匹配整个。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\\n'</span>, <span class="string">'\n'</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">1</span>), match=<span class="string">'\n'</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p><code>&#39;\\n&#39;</code>经过原生转义得到<code>\n</code>（以下我直接表示的不带引号的字符串，都应理解为<code>print</code>出来的字符串），再经过模块转义得到单个换行符；<code>&#39;\n&#39;</code>经过原生转义得到单个换行符。因此匹配整个。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\\\A'</span>, <span class="string">'\A'</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">2</span>), match=<span class="string">'\\A'</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p><code>&#39;\\\A&#39;</code>变成<code>\\A</code>，然后再变成<code>\A</code>；<code>&#39;\A&#39;</code>变成<code>\A</code>。因此匹配整个。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>re.search(<span class="string">'\\\\\\\\\\ '</span>, <span class="string">'\\\ '</span>)</span><br><span class="line">&lt;re.Match object; span=(<span class="number">0</span>, <span class="number">3</span>), match=<span class="string">'\\\\ '</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p><code>&#39;\\\\\\\\\\ &#39;</code>先变成<code>\\\\\_</code>（这里的下划线表示空格），然后变成<code>\\_</code>；<code>&#39;\\\ &#39;</code>变成<code>\\_</code>。因此匹配整个。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Python中的转义字符为什么很容易引起初学者的疑惑，归根结底在于正则表达式中的转义和原生的转义是一个包含但又有区别的关系。只要我们严格按照其转义规则来分析，看懂是很简单的。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Evlpsrfc 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/06/Regex-in-python/" rel="prev" title="Python正则表达式笔记">
+      <i class="fa fa-chevron-left"></i> Python正则表达式笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/18/FFmpeg/" rel="next" title="FFmpeg学习笔记">
+      FFmpeg学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原生转义"><span class="nav-number">1.</span> <span class="nav-text">原生转义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则模块中的转义字符"><span class="nav-number">2.</span> <span class="nav-text">正则模块中的转义字符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Evlpsrfc"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Evlpsrfc</p>
+  <div class="site-description" itemprop="description">你先画个包络面</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evlpsrfc" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evlpsrfc" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:evlpsrfc@163.com" title="E-Mail → mailto:evlpsrfc@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Evlpsrfc</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+  <script>
+  function leancloudSelector(url) {
+    url = encodeURI(url);
+    return document.getElementById(url).querySelector('.leancloud-visitors-count');
+  }
+  if (CONFIG.page.isPost) {
+    function addCount(Counter) {
+      var visitors = document.querySelector('.leancloud_visitors');
+      var url = decodeURI(visitors.getAttribute('id'));
+      var title = visitors.getAttribute('data-flag-title');
+
+      Counter('get', `/classes/Counter?where=${JSON.stringify({ url })}`)
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            var counter = results[0];
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .then(response => response.json())
+              .then(() => {
+                leancloudSelector(url).innerText = counter.time + 1;
+              })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              })
+          } else {
+              leancloudSelector(url).innerText = 'Counter not initialized! More info at console err msg.';
+              console.error('ATTENTION! LeanCloud counter has security bug, see how to solve it here: https://github.com/theme-next/hexo-leancloud-counter-security. \n However, you can still use LeanCloud without security, by setting `security` option to `false`.');
+            
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+  } else {
+    function showTime(Counter) {
+      var visitors = document.querySelectorAll('.leancloud_visitors');
+      var entries = [...visitors].map(element => {
+        return decodeURI(element.getAttribute('id'));
+      });
+
+      Counter('get', `/classes/Counter?where=${JSON.stringify({ url: { '$in': entries } })}`)
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length === 0) {
+            document.querySelectorAll('.leancloud_visitors .leancloud-visitors-count').forEach(element => {
+              element.innerText = 0;
+            });
+            return;
+          }
+          for (let item of results) {
+            let { url, time } = item;
+            leancloudSelector(url).innerText = time;
+          }
+          for (let url of entries) {
+            var element = leancloudSelector(url);
+            if (element.innerText == '') {
+              element.innerText = 0;
+            }
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+  }
+
+  fetch('https://app-router.leancloud.cn/2/route?appId=1ylC7NP7CNcXp2C4NJUngt9Q-gzGzoHsz')
+    .then(response => response.json())
+    .then(({ api_server }) => {
+      var Counter = (method, url, data) => {
+        return fetch(`https://${api_server}/1.1${url}`, {
+          method: method,
+          headers: {
+            'X-LC-Id': '1ylC7NP7CNcXp2C4NJUngt9Q-gzGzoHsz',
+            'X-LC-Key': '6ka8Pkg2leBsmk3LJG4ycMh2',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
