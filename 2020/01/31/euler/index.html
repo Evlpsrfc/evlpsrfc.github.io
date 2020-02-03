@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://evlpsrfc.xyz').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="在数论中，对于一正整数 $n$ ，欧拉函数 $\varphi(n)$ 定义为 $1,2,\cdots,n$ 中与 $n$ 互质的数字的个数。 例如，$\varphi(12)&#x3D;4$ ，因为 $1,5,7,11$ 和 $12$ 互质。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数论中的欧拉函数">
+<meta property="og:url" content="http://evlpsrfc.xyz/2020/01/31/euler/index.html">
+<meta property="og:site_name" content="Evlpsrfc&#39;s Blog">
+<meta property="og:description" content="在数论中，对于一正整数 $n$ ，欧拉函数 $\varphi(n)$ 定义为 $1,2,\cdots,n$ 中与 $n$ 互质的数字的个数。 例如，$\varphi(12)&#x3D;4$ ，因为 $1,5,7,11$ 和 $12$ 互质。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-01-31T11:10:57.000Z">
+<meta property="article:modified_time" content="2020-02-03T11:24:35.943Z">
+<meta property="article:author" content="Evlpsrfc">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://evlpsrfc.xyz/2020/01/31/euler/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>数论中的欧拉函数 | Evlpsrfc's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Evlpsrfc's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://evlpsrfc.xyz/2020/01/31/euler/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Evlpsrfc">
+      <meta itemprop="description" content="你先画个包络面">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Evlpsrfc's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数论中的欧拉函数
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-31 19:10:57" itemprop="dateCreated datePublished" datetime="2020-01-31T19:10:57+08:00">2020-01-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-03 19:24:35" itemprop="dateModified" datetime="2020-02-03T19:24:35+08:00">2020-02-03</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在数论中，对于一正整数 $n$ ，<strong>欧拉函数</strong> $\varphi(n)$ 定义为 $1,2,\cdots,n$ 中与 $n$ 互质的数字的个数。</p>
+<p>例如，$\varphi(12)=4$ ，因为 $1,5,7,11$ 和 $12$ 互质。</p>
+<a id="more"></a>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文的前置知识包括数论、群论的基础内容。</p>
+<p>本文讨论的函数都是算术函数，也就是定义域为正整数、陪域为复数的函数。</p>
+<p>缺少欧拉函数是积性函数这一性质的证明。</p>
+<h2 id="表达式"><a href="#表达式" class="headerlink" title="表达式"></a>表达式</h2><p>首先，若 $n=p^k$ ，$p$ 是素数，$k\geqslant1$，由于 $1,2,\cdots,p^k$ 中与 $p^k$ 互质的数为不含有 $p$ 因子的数，即除了 $p,2p,3p\cdots,p^{k}$ 以外的数，因此 $\varphi(n)=\varphi(p^k)=p^k-p^{k-1}$ 。</p>
+<p>其次，欧拉函数是<strong>积性函数</strong>，即，若 $m,n$ 互质，则 $\varphi(mn)=\varphi(m)\varphi(n)$ 。</p>
+<p>因此，利用算术基本定理，若 $n=p_1^{k_1}\cdots p_r^{k_r}$ ，则</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\varphi(n)&=\varphi\left(\prod_{i=1}^r p_i^{k_i}\right)=\prod_{i=1}^r\varphi\left(p_i^{k_i}\right)=\prod_{i=1}^r\left(p_i^{k_i}-p_i^{k_i-1}\right)\\
+&=\prod_{i=1}^rp_i^{k_i}\left(1-\frac{1}{p_i}\right)=n\prod_{i=1}^r\left(1-\frac{1}{p_i}\right)=n\prod_{p\mid n}\left(1-\frac1p\right)
+\end{aligned}</script><p>事实上，我们还可以这样考虑：</p>
+<p>设 $n=p_1^{k_1}\cdots p_r^{k_r}$ ，定义集合 $A=\{1,2,\cdots,n\}$ 为全集，集合 $A_i$ 的元素为 $1\sim n$ 中被 $p_i$ 整除的数，集合 $S$ 的元素为 $1\sim n$ 中与 $n$ 互质的数，也就是不被任何 $p_i$ 整除的数，因此有</p>
+<script type="math/tex; mode=display">
+S=A-\bigcup_{i=1}^{r}A_i\Rightarrow |S|=|A|-\left|\bigcup_{i=1}^{r}A_i\right|
+\Rightarrow\varphi(n)=n-\left|\bigcup_{i=1}^{r}A_i\right|</script><p>而我们知道以下两个事实：</p>
+<script type="math/tex; mode=display">
+|A_i|=\frac{n}{p_i},|A_i\cap A_j|=\frac{n}{p_ip_j}</script><p>那么根据容斥原理，</p>
+<script type="math/tex; mode=display">
+\left|\bigcup_{i=1}^{r}A_i\right|=\sum_{i=1}^{r}|A_i|-\sum_{1\leqslant i<j\leqslant r}|A_i\cap A_j|+\cdots=\sum_{i}\frac{n}{p_i}-\sum_{i,j}\frac{n}{p_ip_j}+\cdots</script><p>因此有</p>
+<script type="math/tex; mode=display">
+\varphi(n)=n-\sum_{i}\frac{n}{p_{i}}+\sum_{i,j}\frac{n}{p_ip_j}-\cdots\tag{$\ast$}</script><h2 id="性质"><a href="#性质" class="headerlink" title="性质"></a>性质</h2><p>引入<strong>莫比乌斯函数</strong> $\mu$：</p>
+<script type="math/tex; mode=display">
+\mu(n)=\begin{cases}
+1 & \text{若 $n=1$}\\
+(-1)^k & \text{若 $n$ 无平方数因数，且 $n=p_1p_2\cdots p_k$}\\
+0 & \text{若 $n$ 有大于 $1$ 的平方数因数}
+\end{cases}</script><p>由 $\mu$ 的定义容易看出它也是个积性函数。</p>
+<p>我们可以用 $\mu(n)$ 将 $(\ast)$ 式改写为</p>
+<script type="math/tex; mode=display">
+\varphi(n)=n-\sum_{i}\frac{n}{p_{i}}+\sum_{i,j}\frac{n}{p_ip_j}-\cdots=\sum_{d\mid n}\mu(d)\frac{n}{d}\tag{1}</script><p>考虑到 $(1)$ 式的形式，我们再引入<strong>迪利克雷卷积</strong>，对于函数 $f,g$ ，其迪利克雷卷积定义为</p>
+<script type="math/tex; mode=display">
+(f\ast g)(n)=\sum_{d\mid n}f(d)g\left(\frac nd\right)</script><p>容易看出，迪利克雷卷积满足交换律、结合律和分配律。</p>
+<p>将 $(1)$ 式用迪利克雷卷积表示，即为：</p>
+<script type="math/tex; mode=display">
+\varphi=\mu\ast\operatorname{Id}\tag{2}</script><p>其中 $\operatorname{Id}$ 为<strong>恒等函数</strong>，对于任意的 $n$ ，有 $\operatorname{Id}(n)=n$ 。</p>
+<p>记模 $n$ 加法群为 $\mathbb{Z}/n\mathbb{Z}$ 。我们考虑 $\mathbb{Z}/n\mathbb{Z}$ 中生成元的个数。由于 $1$ 一定是生成元，因此数 $a$ 是生成元，当且仅当存在一整数 $b$ ，使得 $ab\equiv1\pmod n$ 。由裴蜀定理，$\gcd(a,n)=1$ 。因此 $a$ 是生成元当且仅当 $a$ 和 $n$ 互质。</p>
+<p>因此 $\mathbb{Z}/n\mathbb{Z}$ 中生成元的个数即为 $\varphi(n)$ 。设 $\mathbb{Z}/d\mathbb{Z}$ 是 $\mathbb{Z}/n\mathbb{Z}$ 的一个子群，由<strong>拉格朗日定理</strong>，$d\mid n$ 。由于不同的子群具有不同的生成元，则不同子群之间无交。因此有</p>
+<script type="math/tex; mode=display">
+\sum_{d\mid n}\varphi(d)=n\tag{3}</script><p>定义常函数 $I(n)\equiv1$ ，则 $(3)$ 式可用迪利克雷卷积表示为</p>
+<script type="math/tex; mode=display">
+\varphi\ast I=\operatorname{Id}\tag{4}</script><p>迪利克雷卷积可看成二元运算，容易看出，该运算的幺元为<strong>单位函数</strong> $\epsilon$ ：</p>
+<script type="math/tex; mode=display">
+\epsilon(n)=\begin{cases}
+1 & \text{若 $n=1$}\\
+0 & \text{其他情况}
+\end{cases}</script><p>则对于任意算术函数 $f$ 有</p>
+<script type="math/tex; mode=display">
+f=f\ast\epsilon=\epsilon\ast f</script><p>定义算数函数 $f$ 的<strong>逆函数</strong> $f^{-1}$ 为满足 $f\ast f^{-1}=\epsilon$ 的函数。</p>
+<p>对比 $(2)$ 式和 $(4)$ 式，可得 $\mu$ 的逆函数为 $I$，即</p>
+<script type="math/tex; mode=display">
+\mu\ast I=\epsilon</script><p>将 $(2)$ 式和 $(4)$ 式的关系作推广，假设对于函数 $f(n)$ 和 $F(n)$ 有如下关系式：</p>
+<script type="math/tex; mode=display">
+F(n)=\sum_{d\mid n}f(d)</script><p>则有</p>
+<script type="math/tex; mode=display">
+f(n)=\sum_{d\mid n}F(d)\mu\left(\frac{n}{d}\right)</script><p>这就是所谓的<strong>莫比乌斯反演公式</strong>。</p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>一、求 $1\sim n!$ 中有多少个整数 $x$ ，满足 $x$ 的所有素因子都大于 $m$ ，其中 $m\leqslant n$ 。</p>
+<p> $x$ 的所有素因子都大于 $m$ ，等价于 $\gcd(x,m!)=1$ 。因此本题等价于求 $\sum_{x=1}^{n!}[\gcd(x,m!)=1]$ 。</p>
+<p>由辗转相除法，$\gcd(x,m!)=\gcd(x\bmod m!,m!)$ 。由于 $m\leqslant n$ ，因此 $m!\mid n!$ 。因此答案即为 $\varphi(m!)\frac{n!}{m!}$ 。</p>
+<p>二、求满足 $\gcd(a,b)=\gcd(a+x,b)$ 且 $0\leqslant x&lt;b$ 的 $x$ 数量。</p>
+<p>由辗转相除法，本题即为求解满足 $\gcd(a,b)=\gcd\left((a+x)\bmod b,b\right)$ 的 $x$ 数量，即满足 $\gcd(a,b)=\gcd(x’,b)$ 的 $x’$ 数量。其中 $0\leqslant x’&lt;b$ 。</p>
+<p>设 $\gcd(a,b)=\gcd(x’,b)=d$ ，则 $\gcd(x’/d,b/d)=1$ 。因此最终的答案即为 $\varphi\left(b/d\right)$ 。</p>
+<p>三、求 $\displaystyle f(n)=\sum_{i=1}^n\gcd(i,n)$ 。</p>
+<p>设 $\gcd(i,n)=d$ ，则 $\gcd(i/d,n/d)=1$ 。满足 $\gcd(i,n)=d$ 的 $i$ 的个数即为满足 $\gcd(i/d,n/d)=1$ 的 $i$ 的个数，也就是 $\varphi(n/d)$ 。因此最终的答案即为</p>
+<script type="math/tex; mode=display">
+f(n)=\sum_{d\mid n}d\cdot\varphi\left(\frac{n}{d}\right)</script><p>若 $n$ 太大，不能预处理所有的 $\varphi(i)$ ，则需要做以下分解：</p>
+<script type="math/tex; mode=display">
+f(p^k)=\sum_{i=0}^kp^i\cdot\varphi\left(p^{k-i}\right)=\sum_{i=0}^{k-1}p^i\cdot p^{k-i-1}(p-1)+p^k=p^{k-1}(kp+p-k)\\f(n)=f\left(\prod_{i=1}^rp^{k_i}\right)=\prod_{i=1}^rf(p^{k_i})=\prod_{i=1}^r\left(p_i^{k_i-1}(k_ip_i+p_i-k_i)\right)</script><p>四、求 $\displaystyle \sum_{i=1}^{n}\sum_{j=1}^{m}[\gcd(i,j)=k]$ 。</p>
+<script type="math/tex; mode=display">
+\begin{split}&\sum_{i=1}^{n}\sum_{j=1}^{m}[\gcd(i,j)=k]=\sum_{i=1}^{\lfloor n/k\rfloor}\sum_{j=1}^{\lfloor m/k\rfloor}[\gcd(i,j)=1]\\=&\sum_{i=1}^{\lfloor n/k\rfloor}\sum_{j=1}^{\lfloor m/k\rfloor}\sum_{d\mid\gcd(i,j)}\mu(d)=\sum_{d=1}^{\lfloor \min(n,m)/k\rfloor}\mu(d)\sum_{i=1}^{\lfloor n/k\rfloor}[d\mid i]\sum_{j=1}^{\lfloor m/k\rfloor}[d\mid j]\\=&\sum_{d=1}^{\lfloor \min(n,m)/k\rfloor}\mu(d)\left\lfloor\frac{n}{kd}\right\rfloor\left\lfloor\frac{m}{kd}\right\rfloor\end{split}</script><p>下面用分块计算即可。</p>
+<blockquote>
+<p> 注：<strong>数论分块</strong></p>
+<p> 对于含有 $\lfloor n/i\rfloor$ 的求和式，对于每个 $i$ ，找到最大的 $j$ 使得 $\lfloor n/i\rfloor=\lfloor n/j\rfloor$ ，则每次以 $[i,j]$ 为一块求和即可。$j$ 的求法如下：</p>
+<script type="math/tex; mode=display">
+ \left\lfloor\frac{n}{i}\right\rfloor\leqslant\frac{n}{i}\Leftrightarrow\left\lfloor\frac{n}{\left\lfloor\frac{n}{i}\right\rfloor}\right\rfloor\geqslant\left\lfloor\frac{n}{\frac ni}\right\rfloor=\lfloor i\rfloor=i\Leftrightarrow i\leqslant\left\lfloor\frac{n}{\left\lfloor\frac{n}{i}\right\rfloor}\right\rfloor\\\Rightarrow j=\left\lfloor\frac{n}{\left\lfloor\frac{n}{i}\right\rfloor}\right\rfloor</script></blockquote>
+<p>五、求 $\displaystyle \sum_{i=1}^n\sum_{j=1}^m\frac{\varphi(ij)}{\varphi(i)\varphi(j)}$ 。</p>
+<script type="math/tex; mode=display">
+\frac{\varphi(ij)}{\varphi(i)\varphi(j)}=\frac{\displaystyle ij\prod_{p\mid ij}\left(1-\frac 1p\right)}{\displaystyle i\prod_{p\mid i}\left(1-\frac 1p\right)j\prod_{p\mid j}\left(1-\frac 1p\right)}=\frac{1}{\displaystyle \prod_{p\mid\gcd(i,j)}\left(1-\frac 1p\right)}=\frac{\gcd(i,j)}{\varphi(\gcd(i,j))}</script><p>因此原式可化简为</p>
+<script type="math/tex; mode=display">
+\begin{aligned}&\sum_{i=1}^n\sum_{j=1}^m\frac{\varphi(ij)}{\varphi(i)\varphi(j)}=\sum_{i=1}^n\sum_{j=1}^m\frac{\gcd(i,j)}{\varphi(\gcd(i,j))}\\=&\sum_{k=1}^{\min(n,m)}\frac{k}{\varphi(k)}\sum_{i=1}^n\sum_{j=1}^m[\gcd(i,j)=k]\\=&\sum_{k=1}^{\min(n,m)}\frac{k}{\varphi(k)}\sum_{d=1}^{\lfloor \min(n,m)/k\rfloor}\mu(d)\left\lfloor\frac{n}{kd}\right\rfloor\left\lfloor\frac{m}{kd}\right\rfloor\end{aligned}</script><p>下面只需预处理 $k/\varphi(k)$ ，$\mu(d)$ 即可。若时间限制较紧，预处理 $k/\varphi(k)$ 时需要先预处理出逆元。</p>
+<blockquote>
+<p>注：<strong>线性预处理逆元</strong></p>
+<p>设 $\operatorname{inv}(i)$ 表示 $i$ 模 $p$ 的逆元，若 $p=ki+j$ ，其中 $k$ 是整数，$j&lt;i$ ，则有 $ki+j\equiv0\pmod p$ 。两边同乘 $i^{-1}j^{-1}$ ，有 $kj^{-1}+i^{-1}\equiv0\pmod p$ 。</p>
+<p>因此 $i^{-1}\equiv-kj^{-1}\pmod p$ 。其中，$k=\lfloor p/i\rfloor$ ，$j=p\bmod i$ 。则</p>
+<script type="math/tex; mode=display">
+\operatorname{inv}(i)=-\lfloor p/i\rfloor\operatorname{inv}(p\bmod i)</script><p>代码实现如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N = <span class="number">1e5</span> + <span class="number">5</span>;</span><br><span class="line"><span class="keyword">int</span> inv[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span></span>&#123;</span><br><span class="line">    inv[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt; N; ++i)</span><br><span class="line">        inv[i] = (MOD -  MOD / i) * inv[MOD % i] % MOD;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><p>借助欧拉筛预处理 $\varphi(n)$ 和 $\mu(n)$ 的方法：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N = <span class="number">1e5</span> + <span class="number">5</span>;</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; pri;</span><br><span class="line"><span class="keyword">bool</span> npr[N];</span><br><span class="line"><span class="keyword">int</span> phi[N];</span><br><span class="line">short <span class="keyword">int</span> mu[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">euler</span><span class="params">()</span></span>&#123; <span class="comment">// O(n)</span></span><br><span class="line">    <span class="built_in">memset</span>(npr, <span class="literal">false</span>, <span class="keyword">sizeof</span>(npr));</span><br><span class="line">    mu[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt; N; ++i)&#123;</span><br><span class="line">        <span class="keyword">if</span> (!npr[i])&#123;</span><br><span class="line">            pri.emplace_back(i);</span><br><span class="line">            phi[i] = i - <span class="number">1</span>;</span><br><span class="line">            mu[i] = <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> p: pri)&#123;</span><br><span class="line">            <span class="keyword">int</span> k = i * p;</span><br><span class="line">            <span class="keyword">if</span> (k &gt;= N) <span class="keyword">break</span>;</span><br><span class="line">            npr[k] = <span class="literal">true</span>;</span><br><span class="line">            <span class="keyword">if</span> (i % p == <span class="number">0</span>)&#123;</span><br><span class="line">                phi[k] = phi[i] * p;</span><br><span class="line">                mu[k] = <span class="number">0</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            phi[k] = phi[i] * (p - <span class="number">1</span>);</span><br><span class="line">            mu[k] = -mu[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不用筛法预处理 $\varphi(n)$ 和 $\mu(n)$ 的方法：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">int</span> N = <span class="number">1e5</span> + <span class="number">5</span>;</span><br><span class="line"><span class="keyword">int</span> phi[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">get_phi</span><span class="params">()</span> </span>&#123; <span class="comment">// O(nloglogn)</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt; N; ++i) <span class="keyword">if</span> (!phi[i])</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = i; j &lt; N; j += i)&#123;</span><br><span class="line">            <span class="keyword">if</span> (!phi[j]) phi[j] = <span class="number">1</span>;</span><br><span class="line">            phi[j] -= phi[j] / i;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br><span class="line">short <span class="keyword">int</span> mu[N];</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">get_mu</span><span class="params">()</span> </span>&#123; <span class="comment">// O(nlogn)</span></span><br><span class="line">    mu[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; N; ++i)</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = i + i; j &lt; N; j += i)</span><br><span class="line">            mu[j] -= mu[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div></div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.png" alt="Evlpsrfc 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/19/openvpn/" rel="prev" title="OpenVPN 学习笔记">
+      <i class="fa fa-chevron-left"></i> OpenVPN 学习笔记
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#表达式"><span class="nav-number">2.</span> <span class="nav-text">表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性质"><span class="nav-number">3.</span> <span class="nav-text">性质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">4.</span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实现"><span class="nav-number">5.</span> <span class="nav-text">代码实现</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Evlpsrfc"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Evlpsrfc</p>
+  <div class="site-description" itemprop="description">你先画个包络面</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/evlpsrfc" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;evlpsrfc" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:evlpsrfc@163.com" title="E-Mail → mailto:evlpsrfc@163.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Evlpsrfc</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>
